@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE vxml SYSTEM 'https://www.w3.org/TR/voicexml21/vxml.dtd'>
+<vxml xmlns="http://www.w3.org/2001/vxml"
+      version="2.1"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2001/vxml http://www.w3.org/TR/2007/REC-voicexml21-20070619/vxml.xsd">
+
+    <catch th:replace="vxml/partial/catch-disconnect.xml :: logout"></catch>
+    
+    <var name="username" th:attr="expr='\'' + ${username} + '\''"/>
+
+    <form id="login">
+        <block>
+            <log label="info" expr="'Logging in user ' + username"/>
+            <prompt bargein="false">
+                <audio th:attr="src=@{/static/ivr/media/system/welcome.wav}"/>
+            </prompt>
+            <goto th:attr="next=@{/j_spring_security_ivr_login} + '?j_username=' + ${username}"/>
+        </block>
+    </form>
+
+</vxml>

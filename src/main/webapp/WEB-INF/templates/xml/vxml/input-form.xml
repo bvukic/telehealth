@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE vxml SYSTEM 'https://www.w3.org/TR/voicexml21/vxml.dtd'>
+<vxml xmlns="http://www.w3.org/2001/vxml"
+      version="2.1"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2001/vxml http://www.w3.org/TR/2007/REC-voicexml21-20070619/vxml.xsd">
+
+    <catch th:replace="vxml/partial/catch-disconnect.xml :: logout"></catch>
+
+    <var name="confirmValue"/>
+    <var name="parameter" th:attr="expr='\'' + ${parameter.getName()} + '\''"/>
+    <var name="min" th:attr="expr=${parameter.getDataValueMin()}"/>
+    <var name="max" th:attr="expr=${parameter.getDataValueMax()}"/>
+    <var name="step" th:attr="expr=${parameter.getDataValueStep()}"/>
+
+    <form id="input">
+        <property name="interdigittimeout" value="3s"/>
+        <property name="termtimeout" value="10s"/>
+        <var name="playHelp" expr="false"/>
+        <block>
+            <log label="info" th:attr="expr='Data input for pramater ' + parameter "/>
+        </block>
+
+        <field name="value">
+            <!-- OSR needs the absolut url to load the grxml file-->
+            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/voice/} + ${parameter.getDataType().getGrammar()}"/>
+            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/dtmf/} + ${parameter.getDataType().getGrammar()}"/>
+
+            <prompt bargein="true">
+                <audio th:attr="src=@{/static/ivr/media/medical/} + ${parameter.getVoicePrompt()}"/>
+            </prompt>
+            <prompt bargein="true" cond="playHelp">
+                <audio th:attr="src=@{/static/ivr/media/system/input_numeric_help.wav}"/>
+            </prompt>
+
+            <filled>
+                <log label="info" expr="'Recognized input value: ' + value"/>
+
+                <if cond="value &lt; min ||  value &gt; max">
+                    <log label="info" expr="'Recognized value ' + value + ' is out of range (' + min + ',' + max + ')'"/>
+                    <throw event="nomatch"/>
+
+                    <else/>
+                    <assign name="confirmValue" expr="value"/>
+                    <goto next="#confirm"/>
+                </if>
+            </filled>
+
+            <noinput>
+                <assign name="playHelp" expr="true"/>
+                <audio th:attr="src=@{/static/ivr/media/system/input_value_null.wav}"/>
+                <reprompt/>
+            </noinput>
+            <nomatch>
+                <clear namelist="value"/>
+                <assign name="playHelp" expr="true"/>
+                <audio th:attr="src=@{/static/ivr/media/system/input_value_wrong.wav}"/>
+                <reprompt/>
+            </nomatch>
+        </field>
+    </form>
+
+    <form id="confirm">
+        <var name="value" expr="confirmValue"/>
+        <var name="playHelp" expr="false"/>
+        <block>
+            <prompt bargein="true">
+                <audio th:attr="src=@{/static/ivr/media/system/input_data_confirm_pre.wav}"/>
+            </prompt>
+        </block>
+        <!-- Say value to confirm -->
+        <subdialog th:attr="src=@{/api/vxml/say/} + ${parameter.getDataType()}" namelist="value" method="GET"/>
+        <block>
+            <prompt bargein="true">
+                <break time="500ms"/>
+                <audio th:attr="src=@{/static/ivr/media/system/input_data_confirm_post.wav}"/>
+            </prompt>
+        </block>
+
+        <field name="confirmed">
+            <!-- OSR needs the absolut url to load the grxml file-->
+            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/voice/boolean.grxml}"/>
+            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/dtmf/boolean.grxml}"/>
+
+            <prompt bargein="true" cond="playHelp">
+                <audio th:attr="src=@{/static/ivr/media/system/input_data_confirm_help.wav}"/>
+            </prompt>
+
+            <filled>
+                <log label="info" expr="'Recognized input: ' + confirmed"/>
+
+                <if cond="confirmed == 0">
+                    <log label="info" expr="'User did not confirm the value ' + value ' . Returning to input...'"/>
+                    <goto next="#input"/>
+
+                    <elseif cond="confirmed == 1"/>
+                    <log label="info" expr="'User confirmed value ' + value"/>
+                    <log label="info" expr="'Storing value ' + value"/>
+                    <submit th:attr="next=@{/api/vxml/input/store/} + ${index}" method="GET" namelist="value"/>
+
+                    <else/>
+                    <log label="error" expr="Confirmed value is invalid"/>
+                    <throw event="nomatch"/>
+                </if>
+            </filled>
+
+            <noinput>
+                <assign name="playHelp" expr="true"/>
+                <audio th:attr="src=@{/static/ivr/media/system/input_value_null.wav}"/>
+                <goto next="#confirm"/>
+            </noinput>
+            <nomatch>
+                <clear namelist="confirmed"/>
+                <assign name="playHelp" expr="true"/>
+                <audio th:attr="src=@{/static/ivr/media/system/input_value_wrong.wav}"/>
+                <goto next="#confirm"/>
+            </nomatch>
+        </field>
+    </form>
+
+</vxml>

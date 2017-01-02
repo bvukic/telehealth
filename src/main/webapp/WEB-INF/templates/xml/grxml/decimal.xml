@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE grammar PUBLIC "-//W3C//DTD GRAMMAR 1.0//EN"
+                  "http://www.w3.org/TR/speech-grammar/grammar.dtd">
+                  
+<grammar xmlns="http://www.w3.org/2001/06/grammar"
+         version="1.0"
+         xml:lang="sl-SI" 
+         mode="voice"
+         xmlns:th="http://www.thymeleaf.org"
+         xmlns:sec="http://www.springframework.org/security/tags"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://www.w3.org/2001/06/grammar http://www.w3.org/TR/speech-grammar/grammar.xsd">
+    
+    
+    <rul id="separator" xml:lang="sl-SI">
+        <one-of>
+            <item tag=",">celih</item>
+            <item tag=",">cela</item>
+            <item tag=",">cele</item>
+            <item tag=",">vejica</item>
+        </one-of>
+    </rul>
+    
+    <rule id="decimal" xml:lang="sl-SI">
+        <item>
+            <ruleref th:attr="uri=@{/api/grxml/number} + '?min=' + ${intMin} + '&max=' + ${intMax} + '#number'"
+                    type="application/srgs+xml"/>
+        </item>
+        <count number="optional">
+            <item>
+                <ruleref uri="#separator"/>
+            </item>
+        </count>
+        <count number="optional">
+            <item>
+                <ruleref th:attr="uri=@{/api/grxml/number} + '?min=' + ${decMin} + '&max=' + ${decMax} + '&zeroPad='+ ${zeroPad} + '#number'"
+                        type="application/srgs+xml"/>
+            </item>
+        </count>
+    </rule>
+    
+    
+    
+</grammar>
+
+ 
+<!-- the default grammar language is US English -->
+
+ 
+  <!-- 
+     

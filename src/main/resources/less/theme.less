@@ -1,0 +1,263 @@
+/* CONTENTS
+/////////////////////////////////////
+*/
+// 00. LESS
+/*
+01. BASE
+02. LAYOUT
+03. MODULES
+04. STATE
+
+This stylesheet is a starting place. Include your own Base, Layout
+Modules, and State styles below.
+
+This style sheet organization is based on the SMACCS system. 
+Please visit the following website for more info: http://smacss.com/
+*/
+
+// Load LESS Library 
+@import "components/_variables";
+
+/****************************
+/////////////////////////////
+
+01. BASE
+
+All base HTML tags that require styling
+
+/////////////////////////////
+****************************/
+
+body {
+  background: @primary-background;
+  font-family: @body-copy;
+  font-size: @base-font-size;
+  line-height: @base-line-height;
+  color: @primary-text; 
+}
+
+ul,
+ol {
+
+}
+
+li {
+
+}
+
+a, a:link, a:visited {
+
+}
+
+a:hover {
+
+}
+
+p {
+
+
+}
+
+hr {
+
+}
+
+/***************************
+////////////////////////////
+
+02. LAYOUT
+
+Styles specific to your layout or website
+
+////////////////////////////
+***************************/
+
+.header {
+	
+}
+
+footer {
+     margin-top: (@padding * 6);
+     padding-bottom: (@padding * 2);
+     padding-top: (@padding * 2);
+     border-top: @border-size @border-color @border-type;
+     color: @light-text;
+}
+
+li.navigation-header {
+    color: @blue1;
+    text-transform: uppercase;
+    font-size: (@font-size - 0.25);
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: @margin 0;
+    padding-left: 15px;
+}
+
+.charts {
+  text-align: center;
+}
+
+/* enable absolute positioning */
+.inner-addon { 
+    position: relative; 
+}
+
+/* style icon */
+.inner-addon .glyphicon {
+    position: absolute;
+    padding: 10px;
+    pointer-events: none;
+}
+
+/* align icon */
+.left-addon .glyphicon  { 
+    left:  30px;
+}
+.right-addon .glyphicon { 
+    right: 30px;
+}
+
+/* add padding  */
+.left-addon input  { 
+    padding-left:  30px; 
+}
+.right-addon input { 
+    padding-right: 30px; 
+}
+
+
+
+/***************************
+////////////////////////////
+
+03. MODULES
+
+Reusable classes or components
+
+////////////////////////////
+***************************/
+
+
+
+/*
+
+Potential modules you could replace...
+
+badges
+
+breadcrumb
+
+buttons
+*/
+@import "components/_buttons";
+/*
+
+button groups
+
+button dropdowns 
+
+carousel
+
+code 
+
+collapse
+
+colors
+*/
+@import "components/_colors.less";
+/*
+dropdown
+*/
+@import "components/_dropdown.less";
+/*
+forms
+*/
+@import "components/_forms.less";
+/*
+icons
+
+input groups 
+
+images
+
+helpers
+
+jumbotron
+
+labels
+
+list group
+
+media object
+
+modal
+
+navs
+*/
+@import "components/_navs";
+/*
+
+navbar
+*/
+@import "components/_navbar";
+/*
+pager
+
+page header
+
+pagination
+
+panels
+*/
+@import "components/_panels";
+/*
+pills
+*/
+@import "components/_pills";
+/*
+
+popover
+
+progress bars
+
+scrollspy
+
+tables
+*/
+@import "components/_tables";
+/*
+
+tabs
+
+thumbnails
+
+tooltip
+
+typography
+*/
+@import "components/_typography";
+/*
+
+well
+
+
+/***************************
+////////////////////////////
+
+04. STATES
+
+////////////////////////////
+***************************/
+
+/* 
+
+Potential states you could replace...
+
+alerts
+
+form validation
+
+*/
+//Custom components
+@import "components/_charts.less";

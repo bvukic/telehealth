@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags">
+    <head>
+        <title>Home</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.2.0/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.2.0/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen" />
+    <link href="/css/core.css"
+          th:href="@{/css/core.css}"
+          rel="stylesheet" media="screen" />
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/2.1.1/jquery.min.js"
+            th:src="@{/webjars/jquery/2.1.1/jquery.min.js}"></script>
+    </head>
+    <body>
+        <div th:switch="${#authentication}? ${#authorization.expression('isAuthenticated()')} : ${false}">
+            <span th:case="${false}">
+                User is not logged in
+            </span>
+            <span th:case="${true}">
+                Logged in user. 
+            </span>
+            <span th:case="*">
+                Should never happen, but who knows...
+            </span>
+        </div>
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+            This content is only shown to administrators. <br/>
+                <a href="users">Users Administration Page</a>
+        </div>
+        <div sec:authorize="hasRole('ROLE_USER')">
+            This content is only shown to users.
+        </div>
+        Logged user: <span sec:authentication="name">Guest</span>
+        Roles: <span sec:authentication="principal.authorities">[ROLE_ANONYMOUS]</span>
+        <div th:if="${#authentication}? ${#authorization.expression('isAuthenticated()')} : ${false}">
+            <form action="j_spring_security_logout" method="post">
+                <input type="submit" value="Logout" />
+            </form>
+        </div>
+        <div></div>
+    </body>
+</html>

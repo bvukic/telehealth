@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE grammar PUBLIC "-//W3C//DTD GRAMMAR 1.0//EN"
+                  "http://www.w3.org/TR/speech-grammar/grammar.dtd">
+                  
+<grammar xmlns="http://www.w3.org/2001/06/grammar"
+         version="1.0"
+         xml:lang="sl-SI" 
+         mode="voice"
+         xmlns:th="http://www.thymeleaf.org"
+         xmlns:sec="http://www.springframework.org/security/tags"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://www.w3.org/2001/06/grammar http://www.w3.org/TR/speech-grammar/grammar.xsd">
+    
+    <!-- Final numbers range. Generates available numbers requested by VXML input field -->
+    <rule id="root">
+        <one-of>
+            <item th:each="number : ${numbers}" th:attr="tag=${number}">
+                <ruleref th:attr="uzi='#n' + ${number}"/>
+            </item>            
+        </one-of>
+    </rule>
+    
+    <!-- Common rules. Used in individuual number rules -->
+    <rule id="tens" xml:lang="sl-SI">
+        <one-of>
+            <item>deset</item>
+            <item>dest</item>
+            <item>dst</item>
+        </one-of>
+    </rule>
+    
+    <rule id="and" xml:lang="sl-SI">
+        <one-of>
+            <item>in</item>
+            <item>n</item>
+        </one-of>
+    </rule>
+
+    <!-- Individual numbers. Used in final numbers range -->
+    <rule id="n0" xml:lang="sl-SI" scope="public">
+        <one-of>
+            <item tag="0">nič</item>
+            <item tag="0">nula</item>
+        </one-of>
+    </rule>
+        
+    <rule id="n1" xml:lang="sl-SI">
+        <item>ena</item>
+    </rule>
+    
+    <rule id="n2" xml:lang="sl-SI">
+        <one-of>
+            <item>dva</item>
+            <item>dve</item>
+            <item>dv</item>
+        </one-of>
+    </rule>
+    
+    <rule id="n3" xml:lang="sl-SI">
+        <item>tri</item>
+    </rule>
+    
+    <rule id="n4" xml:lang="sl-SI">
+        <one-of>
+            <item>štiri</item>
+            <item>štir</item>
+            <item>šter</item>
+            <item>štr</item>
+        </one-of>
+    </rule>
+    
+    <rule id="n5" xml:lang="sl-SI">
+        <item>pet</item>
+    </rule>
+    
+    <rule id="n6" xml:lang="sl-SI">
+        <item>šest</item>
+    </rule>
+    
+    <rule id="n7" xml:lang="sl-SI">
+        <one-of>
+            <item>sedem</item>
+            <item>sedm</item>
+        </one-of>
+    </rule>
+    
+    <rule id="n8" xml:lang="sl-SI">
+        <one-of>
+            <item>osem</item>
+            <item>osm</item>
+        </one-of>
+    </rule>
+    
+    <rule id="n9" xml:lang="sl-SI">
+        <one-of>
+            <item>devet</item>
+            <item>deved</item>
+        </one-of>
+    </rule>
+    
+    <rule id="n10" xml:lang="sl-SI">
+        <one-of>
+            <item>deset</item>
+            <item>dset</item>
+        </one-of>
+    </rule>
+    
+    <rule id="n11" xml:lang="sl-SI">
+        <item><ruleref uri="#n1"/>jst</item>
+    </rule>
+    
+    <rule id="n12" xml:lang="sl-SI">
+        <item><ruleref uri="#n2"/>najst</item>
+    </rule>
+    
+    <rule id="n13" xml:lang="sl-SI">
+        <item><ruleref uri="#n3"/>najst</item>
+    </rule>
+    
+    <rule id="n14" xml:lang="sl-SI">
+        <item><ruleref uri="#n4"/>najst</item>
+    </rule>
+    
+    <rule id="n15" xml:lang="sl-SI">
+        <item><ruleref uri="#n5"/>najst</item>
+    </rule>
+    
+    <rule id="n16" xml:lang="sl-SI">
+        <item><ruleref uri="#n6"/>najst</item>
+    </rule>
+    
+    <rule id="n17" xml:lang="sl-SI">
+        <item><ruleref uri="#n7"/>najst</item>
+    </rule>
+    
+    <rule id="n18" xml:lang="sl-SI">
+        <item><ruleref uri="#n8"/>najst</item>
+    </rule>
+    
+    <rule id="n19" xml:lang="sl-SI">
+        <item><ruleref uri="#n9"/>najst</item>
+    </rule>
+    
+    <rule id="n20" xml:lang="sl-SI">
+        <one-of>
+            <item><ruleref uri="#n2"/>jset</item>
+            <item><ruleref uri="#n2"/>jst</item>
+        </one-of>
+    </rule>
+    
+    
+    <rule id="n21" xml:lang="sl-SI">
+        <item><ruleref uri="#n1"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n22" xml:lang="sl-SI">
+        <item><ruleref uri="#n2"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n23" xml:lang="sl-SI">
+        <item><ruleref uri="#n3"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+
+    <rule id="n24" xml:lang="sl-SI">
+        <item><ruleref uri="#n4"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n25" xml:lang="sl-SI">
+        <item><ruleref uri="#n5"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n26" xml:lang="sl-SI">
+        <item><ruleref uri="#n6"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n27" xml:lang="sl-SI">
+        <item><ruleref uri="#n7"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n28" xml:lang="sl-SI">
+        <item><ruleref uri="#n8"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n29" xml:lang="sl-SI">
+        <item><ruleref uri="#n9"/><ruleref uri="#and"/><ruleref uri="#n20"/></item>
+    </rule>
+    
+    <rule id="n30" xml:lang="sl-SI">
+        <item><ruleref uri="#n3"/><ruleref uri="tens"/></item>
+    </rule>
+    
+    <rule id="n31" xml:lang="sl-SI">
+        <item><ruleref uri="#n1"/><ruleref uri="#and"/><ruleref uri="#n30"/></item>
+    </rule>
+    
+    <rule id="n32" xml:lang="sl-SI">
+        <item><ruleref uri="#n2"/><ruleref uri="#and"/><ruleref uri="#n30"/></item>
+    </rule>
+
+    <rule id="n33" xml:lang="sl-SI">
+        <item><ruleref uri="#n3"/><ruleref uri="#and"/><ruleref uri="#n30"/></item>
+    </rule>    
+    
+</grammar>

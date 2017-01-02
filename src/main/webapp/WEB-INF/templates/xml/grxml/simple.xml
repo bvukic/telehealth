@@ -1,0 +1,43 @@
+<?xml version = '1.0'?>
+<grammar tag-format="sisr/1.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sl" version="1.0">
+
+        <rule id="start" scope="public">
+                <tag>$digstring = new String();
+            </tag>
+                <item repeat="1-">
+
+                                <ruleref uri="#digit"/><tag>this.$digstring=this.$digstring.concat($digit);
+            </tag>
+
+                </item>
+        </rule>
+
+
+        <rule id="digit">
+                <one-of>
+                        <item>nič<tag>'0';
+            </tag></item>
+                        <item>ena<tag>'1';
+            </tag></item>
+                        <item>dva<tag>'2';
+            </tag></item>
+                        <item>dve<tag>'2';
+            </tag></item>
+                        <item>tri<tag>'3';
+            </tag></item>
+                        <item>štiri<tag>'4';
+            </tag></item>
+                        <item>pet<tag>'5';
+            </tag></item>
+                        <item>šest<tag>'6';
+            </tag></item>
+                        <item>sedem<tag>'7';
+            </tag></item>
+                        <item>osem<tag>'8';
+            </tag></item>
+                        <item>devet<tag>'9';
+            </tag></item>
+                </one-of>
+        </rule>
+
+</grammar>

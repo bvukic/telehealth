@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    
+    <!-- Load configuration files -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="classpath:/application.properties"/>
+    </bean>
+    
+    
+    <!-- **************************************************************** -->
+    <!--  RESOURCE FOLDERS CONFIGURATION                                  -->
+    <!--  Dispatcher configuration for serving static resources           -->
+    <!-- **************************************************************** -->
+    <mvc:resources location="/static/" mapping="/static/**" />
+
+    <!-- **************************************************************** -->
+    <!--  SPRING ANNOTATION PROCESSING                                    -->
+    <!-- **************************************************************** -->
+    <mvc:annotation-driven conversion-service="conversionService" />
+    <context:component-scan base-package="si.bvukic.telehealth" />
+    
+    <security:global-method-security pre-post-annotations="enabled" />
+    
+    <!-- **************************************************************** -->
+    <!--  MESSAGE EXTERNALIZATION/INTERNATIONALIZATION                    -->
+    <!--  Standard Spring MessageSource implementation                    -->
+    <!-- **************************************************************** -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="Messages" />
+    </bean>
+
+    <!-- **************************************************************** -->
+    <!--  CONVERSION SERVICE                                              -->
+    <!--  Standard Spring formatting-enabled implementation               -->
+    <!-- **************************************************************** -->
+    <bean id="conversionService" 
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="formatters">
+            <set>
+                <bean class="si.bvukic.telehealth.web.formatter.RoleFormatter" />
+                <bean class="si.bvukic.telehealth.web.formatter.MedicalConditionFormatter" />
+                <bean class="si.bvukic.telehealth.web.formatter.DateFormatter" />
+                <!--
+                <bean class="thymeleafexamples.stsm.web.conversion.VarietyFormatter" />
+                <bean class="thymeleafexamples.stsm.web.conversion.DateFormatter" />
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <!-- **************************************************************** -->
+    <!--  THYMELEAF-SPECIFIC ARTIFACTS                                    -->
+    <!--  TemplateResolver <- TemplateEngine <- ViewResolver              -->
+    <!-- **************************************************************** -->
+
+    <!-- Thymeleaf Template Resolvers -->
+    <!-- web/html templates -->
+    <bean id="webTemplateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/templates/html/" />
+        <property name="characterEncoding" value="UTF-8" />
+        <property name="templateMode" value="HTML" />
+    </bean>
+    <!-- ivr/vxml templates -->
+    <bean id="ivrTemplateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/templates/xml/" />
+        <property name="characterEncoding" value="UTF-8" />
+        <property name="templateMode" value="XML" />
+    </bean>
+    
+    <!-- Thymeleaf Template Engines (Spring4-specific version) -->
+    <!-- web template engine -->
+    <bean id="webTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolvers">
+            <set>
+                <ref bean="webTemplateResolver" />
+            </set>
+        </property>
+        <property name="additionalDialects">
+            <set>
+                <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />
+            </set>
+        </property>         
+    </bean>
+    <!-- ivr template engine -->
+    <bean id="ivrTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolvers">
+            <set>
+                <ref bean="ivrTemplateResolver" />
+            </set>
+        </property>
+        <property name="additionalDialects">
+            <set>
+                <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />
+            </set>
+        </property>         
+    </bean>
+   
+    <!-- Thymeleaf Views Resolver - implementation of Spring's ViewResolver interface -->
+    <!-- web view reslover -->
+    <bean id="webViewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="webTemplateEngine" />
+        <property name="viewNames" value="*.html" />
+        <property name="characterEncoding" value="UTF-8" />
+        <property name="contentType" value="text/html; charset=UTF-8" />
+    </bean>
+    <!-- ivr view reslover -->
+    <bean id="ivrViewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="ivrTemplateEngine" />
+        <property name="viewNames" value="*.xml" />
+        <property name="characterEncoding" value="UTF-8" />
+        <property name="contentType" value="application/xml; charset=UTF-8" />
+    </bean>
+    <!-- Data persistence configuration -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="${db.driverClassName}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="validationQueryTimeout" value="10"/>
+        <property name="initialSize" value="10"/>
+        <property name="maxActive" value="50"/>
+        <property name="maxWait" value="5000"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="removeAbandoned" value="true"/>
+        <property name="removeAbandonedTimeout" value="60"/>
+    </bean>
+   
+ 
+    <!-- Hibernate 4 SessionFactory Bean definition -->
+    <bean id="hibernate4AnnotatedSessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>si.bvukic.telehealth.core.model.User</value>
+                <value>si.bvukic.telehealth.core.model.Role</value>
+                <value>si.bvukic.telehealth.core.model.Permission</value>
+                <value>si.bvukic.telehealth.core.model.MedicalCondition</value>
+                <value>si.bvukic.telehealth.core.model.converter.MedicalDataTypeConverter</value>
+                <value>si.bvukic.telehealth.core.model.converter.MedicalDataPeriodConverter</value>
+                <value>si.bvukic.telehealth.core.model.MedicalDataType</value>
+                <value>si.bvukic.telehealth.core.model.MedicalDataPeriod</value>
+                <value>si.bvukic.telehealth.core.model.MedicalParameter</value>
+                <value>si.bvukic.telehealth.core.model.MedicalData</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${db.hibernate.dialect}</prop>
+                <prop key="hibernate.show_sql">${db.hibernate.show_sql}</prop>
+            </props>
+        </property>
+    </bean>
+     
+    <bean id="userDAO" class="si.bvukic.telehealth.core.dao.UserDAOImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+    <bean id="userService" class="si.bvukic.telehealth.core.service.UserServiceImpl">
+        <property name="userDAO" ref="userDAO"/>
+    </bean>
+    <bean id="roleDAO" class="si.bvukic.telehealth.core.dao.RoleDAOImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+    <bean id="roleService" class="si.bvukic.telehealth.core.service.RoleServiceImpl">
+        <property name="roleDAO" ref="roleDAO"/>
+    </bean>
+    <bean id="medicalConditionDAO" class="si.bvukic.telehealth.core.dao.MedicalConditionDAOImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+    <bean id="medicalConditionService" class="si.bvukic.telehealth.core.service.MedicalConditionServiceImpl">
+        <property name="medicalConditionDAO" ref="medicalConditionDAO"/>
+    </bean>
+    <bean id="medicalParameterDAO" class="si.bvukic.telehealth.core.dao.MedicalParameterDAOImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+    <bean id="medicalParameterService" class="si.bvukic.telehealth.core.service.MedicalParameterServiceImpl">
+        <property name="medicalParameterDAO" ref="medicalParameterDAO"/>
+    </bean>
+    <bean id="medicalDataDAO" class="si.bvukic.telehealth.core.dao.MedicalDataDAOImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+    <bean id="medicalDataService" class="si.bvukic.telehealth.core.service.MedicalDataServiceImpl">
+        <property name="medicalDataDAO" ref="medicalDataDAO"/>
+    </bean>
+ 
+    <tx:annotation-driven transaction-manager="transactionManager"/>     
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+</beans>
