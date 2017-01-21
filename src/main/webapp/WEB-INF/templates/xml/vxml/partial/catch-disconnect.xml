@@ -15,11 +15,12 @@ and open the template in the editor.
 
     <catch event="connection.disconnect.hangup" th:fragment="logout">
         <log label="info">User disconnected. Logging out...</log>
-        <data src="@{/j_spring_security_ivr_logout}" method="GER"/>
+        <goto th:attr="next=@{/api/vxml/logout}"/>
     </catch>
     
     <catch event="connection.disconnect.hangup" th:fragment="exit">
-        <log label="info">User disconnected</log>
+        <log label="info">Caller disconnected</log>
+        <exit/>
     </catch>
 
 </vxml>

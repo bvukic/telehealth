@@ -58,14 +58,16 @@ public class IvrSayController {
             case SCALE_QUANTITY:
                 promptList.add("/quantity/" + (int) value + PROMPT_FILE_EXTENSION);
                 break;
-                
+            case SCALE_FREQUENCY:
+                promptList.add("/frequency/" + (int) value + PROMPT_FILE_EXTENSION);
+                break;    
             case NUMERIC:
                 String frac = Float.toString(value);
                 frac =  frac.substring(frac.indexOf(".") + 1);
                 LOG.debug("Numeric type; value={}, int={}, frac={}", value, (int) value, frac);
                 
                 promptList = generateIntPromptList("/numeric/", (int) value);
-                if (!frac.startsWith("0")) {
+                if (Integer.parseInt(frac) > 0) {
                     promptList.add("/numeric/point" + PROMPT_FILE_EXTENSION);
                     for (int i = 0; i < frac.length(); i++ ) {
                         if (frac.charAt(i) == '0') {
@@ -86,6 +88,52 @@ public class IvrSayController {
         model.addAttribute("bargein", bargein);
         
         return "vxml/say.xml";
+    }
+    
+    
+    @RequestMapping(value = "/api/vxml/say/{type}/help", method = RequestMethod.GET)
+    public String help(@PathVariable("type") String requestedType, 
+            @RequestParam(name = "bargein", required = false, defaultValue = "true") boolean bargein,
+            @RequestParam(name = "subdialog", required = false, defaultValue = "true") boolean isSubdialog,
+            Model model) 
+            throws IllegalAccessException {
+        
+        MedicalDataType type = MedicalDataType.BOOLEAN;
+        try {
+            type = MedicalDataType.valueOf(requestedType.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            LOG.error("Can't say help of type {}", requestedType);
+            throw new IllegalArgumentException("Invalid type " + requestedType);
+        }    
+        String prompt = "";
+        switch (type) {
+            case BOOLEAN:
+                prompt = "/boolean/help" + PROMPT_FILE_EXTENSION;
+                break;
+            case SCALE_ARGUMENT:
+                prompt = "/argument/help"  + PROMPT_FILE_EXTENSION;
+                break;
+            case SCALE_CONDITION:
+                prompt = "/condition/help" + PROMPT_FILE_EXTENSION;
+                break;
+            case SCALE_QUANTITY:
+                prompt = "/quantity/help" + PROMPT_FILE_EXTENSION;
+                break;
+            case SCALE_FREQUENCY:
+                prompt = "/frequency/help" + PROMPT_FILE_EXTENSION;
+                break;    
+            case NUMERIC:
+                prompt = "/numeric/help" + PROMPT_FILE_EXTENSION;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid type " + requestedType);
+        }
+        model.addAttribute("bargin", bargein);
+        model.addAttribute("isSubdialog", isSubdialog);
+        model.addAttribute("prompt", prompt);
+        
+        return "vxml/help.xml";
+        
     }
     
     /**

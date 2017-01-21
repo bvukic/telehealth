@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<!DOCTYPE grammar PUBLIC "-//W3C//DTD GRAMMAR 1.0//EN"
+                  "http://www.w3.org/TR/speech-grammar/grammar.dtd">
+                  
+<grammar xmlns="http://www.w3.org/2001/06/grammar"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://www.w3.org/2001/06/grammar http://www.w3.org/TR/speech-grammar/grammar.xsd"
+         tag-format="swi-semantics/1.0"
+         version="1.0"
+         xml:lang="sl-SI" 
+         mode="voice"
+         root="ROOT">
+    
+    <!-- <lexicon uri="http://www.bosti.org/telehealth/static/ivr/grammar/numbers.xml"/> -->
+    <meta name="swirec_simple_result_key" content="result"/>
+    
+    <rule id="ROOT" scope="public">
+        <tag>result = 0;</tag>
+        <one-of>
+            <item>nikoli<tag>result = 0;</tag></item>
+            <item>ne<tag>result = 0;</tag></item>
+            <item>redko<tag>result = 1;</tag></item>
+            <item>srednje<tag>result = 2;</tag></item>
+            <item>pogosto<tag>result = 3;</tag></item>
+            <item>vedno<tag>result = 4;</tag></item>
+            <item>da<tag>result = 4;</tag></item>
+            <item>ja<tag>result = 4;</tag></item>
+            <item>zelo <item repeat="0-1">pogostoo</item><tag>result = 4;</tag></item>
+        </one-of>
+    </rule>
+    
+</grammar>

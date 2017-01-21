@@ -38,56 +38,39 @@ and open the template in the editor.
                 <div class="col-lg-2">
                     <div  th:fragment="sidebar">
                         <div class="collapse navbar-collapse" id="telehealth-nav" 
-                             th:if="${#authentication}? ${#authorization.expression('isAuthenticated()')} : ${false}">
+                             sec:authorize="isAuthenticated()">
                             <!-- Navigation for registered users -->
                             <ul class="nav nav-pills nav-stacked">
-                                <li class="navigation-header">Podatki</li>
-                                <li th:class="${classActiveDashboard}">
+                                <li class="navigation-header" sec:authorize="hasRole('ROLE_PERMISSION_data')">Podatki</li>
+                                <li th:class="${classActiveDashboard}" sec:authorize="hasRole('ROLE_PERMISSION_data_dashboard')">
                                     <a href="#" th:href="@{/dashboard}">
                                         <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Namizje
                                     </a>
                                 </li>
-                                <li th:class="${classActiveDataInput}">
+                                <li th:class="${classActiveDataInput}" sec:authorize="hasRole('ROLE_PERMISSION_data_input')">
                                     <a href="#" th:href="@{/data/input}">
                                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Vnos
                                     </a>
                                 </li>
-                                <li th:class="${classActiveDataHistory}">
+                                <li th:class="${classActiveDataHistory}" sec:authorize="hasRole('ROLE_PERMISSION_data_history')">
                                     <a href="#" th:href="@{/data/history}">
                                         <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Zgodovina
                                     </a>
                                 </li>
-                                <li th:class="${classActiveDataPrint}">
-                                    <a href="#" th:href="@{/data/print}">
-                                        <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Izpis
-                                    </a>
-                                </li>
-                                <li sec:authorize="hasRole('ROLE_PERMISSION_administration')" class="navigation-header">Administracija</li>
+                                <li class="navigation-header" sec:authorize="hasRole('ROLE_PERMISSION_administration')">Administracija</li>
                                 <li th:class="${classActiveUsers}" 
                                       sec:authorize="hasRole('ROLE_PERMISSION_administration_users')">
                                     <a href="#" th:href="@{/users}">
                                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Uporabniki
                                     </a>
                                 </li>
-                                <li th:class="${classActiveOrganisations}"
-                                    sec:authorize="hasRole('ROLE_PERMISSION_administration_organisations')">
-                                    <a href="#" th:href="@{/organisations}">
-                                        <span class="glyphicon glyphicon-tower" aria-hidden="true"></span> Organizacije
-                                    </a>
-                                </li>
-                                <li th:class="${classActiveRolesAndPermissions}"
-                                    sec:authorize="hasRole('ROLE_PERMISSION_administration_rolesandpremissions')">
-                                    <a href="#" th:href="@{/roles}">
-                                        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Vloge in pravice
-                                    </a>
-                                </li>
-                                <li class="navigation-header">Profil</li>
-                                <li th:class="${classActiveSettings}">
+                                <li class="navigation-header" sec:authorize="isAuthenticated()">Profil</li>
+                                <li th:class="${classActiveSettings}" sec:authorize="isAuthenticated()">
                                     <a href="#" th:href="@{/settings}">
                                         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Nastavitve
                                     </a>
                                 </li>
-                                <li>
+                                <li sec:authorize="isAuthenticated()">
                                     <a href="#" th:href="@{/j_spring_security_logout}">
                                         <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Odjavi
                                     </a>

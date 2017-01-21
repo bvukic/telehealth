@@ -16,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import si.bvukic.telehealth.core.model.User;
 import si.bvukic.telehealth.core.service.UserService;
@@ -29,11 +30,18 @@ public class AppAuthenticationProvider implements AuthenticationProvider {
  
     private static final Logger LOG = LoggerFactory.getLogger(AppAuthenticationProvider.class);
     private UserService userService;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired(required=true)
     @Qualifier(value="userService")
-    public void setUserService(UserService userService){
+    public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+    
+    @Autowired(required=true)
+    @Qualifier(value="passwordEncoder")
+    public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
  
     @Override
@@ -48,7 +56,7 @@ public class AppAuthenticationProvider implements AuthenticationProvider {
  
         String suppliedPassword = authentication.getCredentials().toString();
  
-        if(!user.getPassword().equals(suppliedPassword)){
+        if(!passwordEncoder.matches(suppliedPassword, user.getPassword())){
             throw new BadCredentialsException("Invalid credentials");
         }
         

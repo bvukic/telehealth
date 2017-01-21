@@ -15,7 +15,8 @@ public enum MedicalDataType {
     NUMERIC("numeric.grxml"),
     SCALE_CONDITION("condition.grxml"),
     SCALE_ARGUMENT("argument.grxml"),
-    SCALE_QUANTITY("quantity.grxml");
+    SCALE_QUANTITY("quantity.grxml"),
+    SCALE_FREQUENCY("frequency.grxml");
     
     private final String grammar;
     

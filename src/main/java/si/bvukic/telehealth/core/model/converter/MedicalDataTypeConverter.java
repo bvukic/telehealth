@@ -30,6 +30,8 @@ public class MedicalDataTypeConverter implements AttributeConverter<MedicalDataT
                 return "SA";
             case SCALE_QUANTITY:
                 return "SQ";
+            case SCALE_FREQUENCY:
+                return "SF";
             default:
                 throw new IllegalArgumentException("Unknown " + attribute);
         }
@@ -48,6 +50,8 @@ public class MedicalDataTypeConverter implements AttributeConverter<MedicalDataT
                 return SCALE_ARGUMENT;
             case "SQ":
                 return SCALE_QUANTITY;
+            case "SF":
+                return SCALE_FREQUENCY;
             default:
                 throw new IllegalArgumentException("Unknown " + dbData);
         }

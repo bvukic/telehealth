@@ -12,7 +12,7 @@ and open the template in the editor.
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Prijava</title>
+        <title>TeleZdravje: Prijava</title>
         <link href="/static/web/css/bootstrap.min.css"
               th:href="@{/static/web/css/bootstrap.min.css}"
               rel="stylesheet" media="screen" />
@@ -41,9 +41,7 @@ and open the template in the editor.
                 <div class="col-sm-6 col-md-4 col-md-offset-4">
                     <h3 class="text-center">Prijava</h3>
                     <div>
-                        <img class="center-block" src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120"
-                             alt=""/>
-                        <p class="bg-danger" th:if="${loginError}">Neveljavno uporabniško ime ali geslo</p>
+                        <p class="text-danger text-center" th:if="${loginError}">Neveljavno uporabniško ime ali geslo</p>
                         <form th:action="@{/j_spring_security_check}" method="post">
                             <input type="text" id="j_username" name="j_username" class="form-control" 
                                    placeholder="Uporabniško ime" required="required" autofocus="autofocus" />
@@ -51,14 +49,16 @@ and open the template in the editor.
                                    placeholder="Geslo" required="required"/>
                             <button type="submit" class="btn btn-lg btn-primary btn-block">
                                 Prijavi se</button>
+                            <!--
                             <label class="checkbox pull-left">
                                 <input type="checkbox" value="remember-me"/>
                                 Zapomni si me
                             </label>
-                            <a href="#" class="pull-right">Potrebujete pomoč? </a><span class="clearfix"></span>
+                            -->
+                            <a href="#" th:href="@{/login/help}" class="pull-right">Potrebujete pomoč? </a><span class="clearfix"></span>
                         </form>
                     </div>
-                    <a href="#" class="text-center">Nimate uporabniškega imena in gesla? Registrirajte se. </a>
+                    <a href="#" th:href="@{/register}" class="text-center">Nimate uporabniškega imena in gesla? Registrirajte se. </a>
                 </div>
             </div>
         </div>

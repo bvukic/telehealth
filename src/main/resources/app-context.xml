@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
@@ -10,13 +10,13 @@
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
             http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
             http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
-    
+
     <!-- Load configuration files -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations" value="classpath:/application.properties"/>
     </bean>
-    
-    
+
+
     <!-- **************************************************************** -->
     <!--  RESOURCE FOLDERS CONFIGURATION                                  -->
     <!--  Dispatcher configuration for serving static resources           -->
@@ -28,9 +28,9 @@
     <!-- **************************************************************** -->
     <mvc:annotation-driven conversion-service="conversionService" />
     <context:component-scan base-package="si.bvukic.telehealth" />
-    
+
     <security:global-method-security pre-post-annotations="enabled" />
-    
+
     <!-- **************************************************************** -->
     <!--  MESSAGE EXTERNALIZATION/INTERNATIONALIZATION                    -->
     <!--  Standard Spring MessageSource implementation                    -->
@@ -43,7 +43,7 @@
     <!--  CONVERSION SERVICE                                              -->
     <!--  Standard Spring formatting-enabled implementation               -->
     <!-- **************************************************************** -->
-    <bean id="conversionService" 
+    <bean id="conversionService"
           class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
         <property name="formatters">
             <set>
@@ -76,7 +76,7 @@
         <property name="characterEncoding" value="UTF-8" />
         <property name="templateMode" value="XML" />
     </bean>
-    
+
     <!-- Thymeleaf Template Engines (Spring4-specific version) -->
     <!-- web template engine -->
     <bean id="webTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
@@ -89,7 +89,7 @@
             <set>
                 <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />
             </set>
-        </property>         
+        </property>
     </bean>
     <!-- ivr template engine -->
     <bean id="ivrTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
@@ -102,9 +102,9 @@
             <set>
                 <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />
             </set>
-        </property>         
+        </property>
     </bean>
-   
+
     <!-- Thymeleaf Views Resolver - implementation of Spring's ViewResolver interface -->
     <!-- web view reslover -->
     <bean id="webViewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
@@ -120,6 +120,35 @@
         <property name="characterEncoding" value="UTF-8" />
         <property name="contentType" value="application/xml; charset=UTF-8" />
     </bean>
+
+    <!-- email -->
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="host" value="${email.smtp.server}"/>
+        <property name="port" value="${email.smtp.port}"/>
+        <property name="username" value="${email.smtp.username}"/>
+        <property name="password" value="${email.smtp.password}"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">${email.smtp.authentication}</prop>
+                <prop key="mail.smtp.starttls.enable">${email.smtp.enabletls}</prop>
+                <prop key="mail.debug">true</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+        <property name="velocityProperties">
+            <value>
+                input.encoding=UTF-8
+                output.encoding=UTF-8
+                response.encoding=UTF-8
+                resource.loader=class
+                class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+            </value>
+        </property>
+    </bean>
+
     <!-- Data persistence configuration -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
           destroy-method="close">
@@ -136,8 +165,8 @@
         <property name="removeAbandoned" value="true"/>
         <property name="removeAbandonedTimeout" value="60"/>
     </bean>
-   
- 
+
+
     <!-- Hibernate 4 SessionFactory Bean definition -->
     <bean id="hibernate4AnnotatedSessionFactory"
           class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
@@ -163,7 +192,10 @@
             </props>
         </property>
     </bean>
-     
+    
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+    </bean>
+
     <bean id="userDAO" class="si.bvukic.telehealth.core.dao.UserDAOImpl">
         <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
     </bean>
@@ -194,8 +226,12 @@
     <bean id="medicalDataService" class="si.bvukic.telehealth.core.service.MedicalDataServiceImpl">
         <property name="medicalDataDAO" ref="medicalDataDAO"/>
     </bean>
- 
-    <tx:annotation-driven transaction-manager="transactionManager"/>     
+    <bean id="emailNotificationService" class="si.bvukic.telehealth.core.service.EmailNotificationServiceImpl">
+        <property name="mailSender" ref="mailSender"/>
+        <property name="velocityEngine" ref="velocityEngine"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
     <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
     </bean>

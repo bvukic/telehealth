@@ -39,15 +39,15 @@ import si.bvukic.telehealth.web.model.DashboardChartPanel;
  */
 @Controller
 @SessionAttributes("classActiveDashboard")
-public class DashboardController extends GenericChartController {
+public class DataDashboardController extends GenericChartController {
      
-    private static final Logger LOG = LoggerFactory.getLogger(DashboardController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataDashboardController.class);
     private static final String TIMEZONE = "Europe/Ljubljana";
     private final MedicalDataService medicalDataService;
     
 
     @Autowired
-    public DashboardController(MedicalDataService medicalDataService, UserService userService) {
+    public DataDashboardController(MedicalDataService medicalDataService, UserService userService) {
         super(userService);
         this.medicalDataService = medicalDataService;
     }
@@ -59,7 +59,7 @@ public class DashboardController extends GenericChartController {
     }
     
     
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_dashboard')")
     @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
     public String loadDashboard(Locale locale, Model model) {
         User user = super.getAuthenticatedUser();
@@ -67,7 +67,6 @@ public class DashboardController extends GenericChartController {
         LocalDate today = LocalDate.now(ZoneId.of(TIMEZONE));
         LocalDateTime todayMidnight = LocalDateTime.of(today, LocalTime.MIDNIGHT);
         //Get data for last 7 days
-        //TODO Check timezone settings for Instant
         Instant start = todayMidnight.minusDays(7).toInstant(ZoneOffset.ofHours(1));
         
         LOG.debug("Getting dashboard data from data: {}", Date.from(start));
@@ -81,10 +80,6 @@ public class DashboardController extends GenericChartController {
         }
         LOG.debug("Total chart panels: {}", dashbordChartPanels.size());
         model.addAttribute("dashbordChartPanels", dashbordChartPanels);
-        
-        //TODO Delete debug data
-        model.addAttribute("username", user.getUsername());
-        model.addAttribute("roles", user.getRoles());
         
         return "dashboard.html";
     }

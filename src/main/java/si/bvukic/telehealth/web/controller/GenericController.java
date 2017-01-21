@@ -29,11 +29,11 @@ public class GenericController {
         this.userService = userService;
     }
 
-    public UserService getUserService() {
+    protected UserService getUserService() {
         return userService;
     }
     
-    public User getAuthenticatedUser() {
+    protected User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
         return userService.getUserByUsername(auth.getName());
     }

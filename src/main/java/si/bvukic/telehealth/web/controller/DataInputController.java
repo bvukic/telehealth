@@ -5,7 +5,6 @@
  */
 package si.bvukic.telehealth.web.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import si.bvukic.telehealth.core.model.MedicalData;
-import si.bvukic.telehealth.core.model.MedicalParameter;
 import si.bvukic.telehealth.core.model.User;
 import si.bvukic.telehealth.core.service.MedicalDataService;
 import si.bvukic.telehealth.core.service.UserService;
@@ -34,9 +32,9 @@ import si.bvukic.telehealth.core.service.UserService;
  * @author bostjanvukic
  */
 @Controller
-public class MedicalDataController {
+public class DataInputController {
     
-    private static final Logger LOG = LoggerFactory.getLogger(MedicalDataController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataInputController.class);
     
     private MedicalDataService medicalDataService;
     private UserService userService;
@@ -53,7 +51,7 @@ public class MedicalDataController {
         this.userService = userService;
     }
     
-    @PreAuthorize("hasRole('ROLE_PERMISSION_administration_users')")
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_input')")
     @RequestMapping(value = "/data/input", method = RequestMethod.GET)
     public String datInputInit(HttpServletRequest request, HttpServletResponse response, Model model)
             throws Exception {
@@ -70,6 +68,10 @@ public class MedicalDataController {
             LOG.info("No data to input. Data for user {} is up to date.", user.getUsername());
             model.addAttribute("upToDate", true);
             return "medicalDataInput.html";
+        } else {
+            for (MedicalData data : medicalDataList) {
+                data.setDefaultValue();
+            }
         }
         LOG.debug("User {} needs to enter data for {} parameters", user.getUsername(), medicalDataList.size());
         request.getSession().setAttribute("MedicalDataController_medicalDataList", medicalDataList);
@@ -84,7 +86,7 @@ public class MedicalDataController {
         return "medicalDataInput.html";
     }
     
-    @PreAuthorize("hasRole('ROLE_PERMISSION_administration_users')")
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_input')")
     @RequestMapping(value = "/data/input/{index}/{command}", method = RequestMethod.POST)
     public String dataInputSave(@PathVariable("index") int index, @ModelAttribute("data") MedicalData data,
             @PathVariable("command") String command, HttpServletRequest request, HttpServletResponse response, 
@@ -110,7 +112,7 @@ public class MedicalDataController {
                 user.getUsername(), index, command, data.getUser().getUsername(), data.getDataValue());
         
         //Validate input dataValue
-        if (!this.isDataValid(data)) {
+        if (!data.isValueValid()) {
             model.addAttribute("error", "Napaka: Vnešeni podatki niso veljavni!");
             model.addAttribute("data", data);
             model.addAttribute("index", index);
@@ -149,7 +151,7 @@ public class MedicalDataController {
     }
     
     //Load data for last parameter
-    @PreAuthorize("hasRole('ROLE_PERMISSION_administration_users')")
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_input')")
     @RequestMapping(value = "/data/input/last", method = RequestMethod.POST)
     public String dataInputLoadLast(HttpServletRequest request, HttpServletResponse response, 
             Model model) throws Exception {
@@ -171,16 +173,5 @@ public class MedicalDataController {
         
         return "medicalDataInput.html";
     }
-    
-    private boolean isDataValid(MedicalData data) {
-        float min = data.getMedicalParameter().getDataValueMin();
-        float max = data.getMedicalParameter().getDataValueMax();
-        
-        return (data.getDataValue() >= min && data.getDataValue() <= max);
-    }
-    
-    
-    
-    
     
 }

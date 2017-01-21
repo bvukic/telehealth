@@ -28,7 +28,7 @@ and open the template in the editor.
             <item>malo<tag>result = 1;</tag></item>
             <item>srednje<tag>result = 2;</tag></item>
             <item>veliko<tag>result = 3;</tag></item>
-            <item>zelo veliko<tag>result = 4;</tag></item>
+            <item>zelo <item repeat="0-1">veliko</item><tag>result = 4;</tag></item>
         </one-of>
     </rule>
     

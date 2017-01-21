@@ -1,0 +1,41 @@
+<html>
+    <body>
+        <h2>Pozdravljeni ${user.getFirstName()} ${user.getLastName()},</h2>
+        <p>
+            Uspešno ste se registrerali v aplikacijo TeleZdravje. Aplikacija je primarno namenjena raziskovanju 
+            uporabniške izkušnje vpisovanja podatkov z uporabo iteraktivnega glasovnega odzivnika. Omogoča pa tudi
+            vnos preko spleta. 
+        </p>
+        <h3>
+            Interaktinvi glasovni odzivnik
+        </h3>
+        <p>
+            Za vnos podatkov z uporabo odzvinika pokličite <b><a href="tel:+38651951155">051 951 155</a></b>. Pomembo je, da kličete iz telefonske številke,
+            ki ste jo navedli ob registraciji. To je številka <b>${user.getPhone()}</b>. V odzivniku vnesete podatke tako, da 
+            jih izgovorite. <b>Prepoznavalnik govora</b> bo prepoznal vnos in shranil podatek. Omogočen je tudi vnos z uporabo 
+            številčnice telefona (DTMF). V primeru, da prepoznavalnik govora ne bo prepoznal vnosa, počakajte in prisluhnite 
+            navodilom.
+        </p>
+        <h3>
+            Spletna aplikacija 
+        </h3>
+        <p>
+            Spletna aplikacija omogoča vnašanje, popravljanje in brisanje podatkov. V aplikacijo se prijavite tako, da v obrazec
+            za prijavo vpišete izbrano uporabniško ime, <b>${user.getUsername()}</b> in geslo.
+        </p>
+        <p>
+            <a href="http://telezdravje.si">Prijava v splento aplikacijo</a>
+        </p>
+        <h3>IVR kot orodje telemedicine</h3>
+        <p>
+            Ta aplikacija je sestavni del diplomskega dela. Izdelana je z omejeno funkcionalnostjo, saj je namenjena preizušanju 
+            uporabnosti interaktivnega glasovnega odzivnika za uporabo na področju telemedicine. Osebni in zdravstveni podatki ne 
+            bodo javno objavljeni.
+        </p>
+        <p>
+            Za uporabo aplikacije in sodelvoanje se Vam iskreno zahvaljujem.<br>
+            <bt>
+            Boštjan Vukič
+        </p>
+    </body>
+</html>

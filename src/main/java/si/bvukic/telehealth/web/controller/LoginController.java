@@ -28,6 +28,12 @@ public class LoginController {
     model.addAttribute("loginError", true);
     return "login.html";
   }
+  
+  // Login help
+  @RequestMapping("/login/help")
+  public String loginHelp() {
+    return "loginHelp.html";
+  }
 
     
 }

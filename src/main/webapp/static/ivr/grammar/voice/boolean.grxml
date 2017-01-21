@@ -25,11 +25,8 @@ and open the template in the editor.
         <tag>result = 0;</tag>
         <one-of>
             <item>ne<tag>result = 0;</tag></item>
-            <item>prekliči<tag>result = 0;</tag></item>
             <item>da<tag>result = 1;</tag></item>
             <item>ja<tag>result = 1;</tag></item>
-            <item>v redu<tag>result = 1;</tag></item>
-            <item>potrdi<tag>result = 1;</tag></item>
         </one-of>
     </rule>
     

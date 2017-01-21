@@ -12,7 +12,7 @@ and open the template in the editor.
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Namizje</title>
+        <title>TeleZdravje: Namizje</title>
         <link href="/static/web/css/bootstrap.min.css"
               th:href="@{/static/web/css/bootstrap.min.css}"
               rel="stylesheet" media="screen" />
@@ -73,38 +73,11 @@ and open the template in the editor.
                                                         }
                                                 );
                                             </script>
+                                            <div th:replace="partial/valuelegend.html :: text"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
-
-
-
-                            <div class="panel panel-default" th:switch="${#authentication}? ${#authorization.expression('isAuthenticated()')} : ${false}">
-                                <div class="panel-body" th:case="${false}">
-                                    User is not logged in. <br/>
-                                    <a class="btn btn-primary" href="#" th:href="@{/login}">
-                                        <span class="glyphicon glyphicon-log-in"> Login</span>
-                                    </a>
-                                </div>
-                                <div class="panel-body" th:case="${true}">
-                                    Logged in user.
-                                </div>
-                                <div class="panel-body" th:case="*">
-                                    Should never happen, but who knows...
-                                </div>
-                            </div>
-                            <div sec:authorize="hasRole('ROLE_ADMIN')">
-                                This content is only shown to administrators. <br/>
-                                <a href="users">Users Administration Page</a>
-                            </div>
-                            <div sec:authorize="hasRole('ROLE_USER')">
-                                This content is only shown to users.
-                            </div>
-                            Logged user: <span sec:authentication="name">Guest</span>
-                            Roles: <span sec:authentication="principal.authorities">[ROLE_ANONYMOUS]</span>
                         </div>
                     </div>
                 </div>           

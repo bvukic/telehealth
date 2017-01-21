@@ -12,7 +12,7 @@ and open the template in the editor.
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Uporabniki</title>
+        <title>TeleZdravje: Uporabniki</title>
         <link href="/static/web/css/bootstrap.min.css"
               th:href="@{/static/web/css/bootstrap.min.css}"
               rel="stylesheet" media="screen" />
@@ -38,9 +38,12 @@ and open the template in the editor.
         th:src="@{/static/web/js/bootstrap-datepicker.min.js}"></script>
     </head>
     <body th:onload="'$(\'input[name=username]\').focus();' +
-            '$(function () { $(\'#birthdate\').datepicker({format: \'' + #{date.datepicker.format} + '\', language: \'' + #{date.datepicker.language} + '\'}) });'">
+          '$(function () { $(\'#birthdate\').datepicker({format: \'' + #{date.datepicker.format} + '\', language: \'' + #{date.datepicker.language} + '\'}) });'">
         <!-- Import navbar -->
         <nav th:replace="partial/header.html :: navbar"></nav>
+
+        <!-- Import userForm validation -->
+        <div th:replace="partial/userForm.html :: validation"></div>
 
         <div class="container">
             <div class="row">
@@ -54,90 +57,30 @@ and open the template in the editor.
                                 <h3>Dodaj <small>Dodaj novega uporabnika</small></h3>
                             </div>
                             <div th:if="${ user.id != null }" class="page-header">
-                                <h3>Uredi 
-                                    <small 
-                                        th:text="'Uredi uporabnika: ' 
-                                            + ${user.firstName} + ' ' + ${user.lastName} + ' (' + ${user.username} + ')'">
+                                <h3>Uredi
+                                    <small
+                                        th:text="'Uredi uporabnika: '
+                                        + ${user.firstName} + ' ' + ${user.lastName} + ' (' + ${user.username} + ')'">
                                         Uredi uporabnika</small>
                                 </h3>
                             </div>
-                            <form th:object="${user}" action="/users/add"
-                                  th:action="@{/users/add}" method="POST"
+                            <form name="userForm" th:object="${user}" action="/users/add"
+                                  th:action="@{/users/add}" method="POST" onSubmit="return validate(event);"
                                   class="form-horizontal">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">Podatki</div>
-                                            <div class="form-group">
-                                                <div>
-                                                    <input type="hidden" id="id" th:field="*{id}" />
-                                                    <input type="hidden" id="version" th:field="*{version}" />
-                                                </div>
-                                                <label class="control-label col-xs-4" for="enabled">Omogočen</label>
-                                                <div class="col-xs-8">
-                                                    <input class="form-control" type="checkbox" id="enabled" name="enabled" th:checked="*{enabled}" />
-                                                </div>
-                                                <label class="control-label col-xs-4" for="username">Uporabniško ime</label>
-                                                <div class="col-xs-8">
-                                                    <input  class="form-control" type="text" id="username" name="username" th:value="*{username}" />
-                                                </div>
-                                                <label class="control-label col-xs-4" for="password">Geslo</label>
-                                                <div class="col-xs-8">
-                                                    <input  class="form-control" type="text" id="password" name="password" th:value="*{password}" />
-                                                </div>                                                
-                                                <label class="control-label col-xs-4" for="firstName">Ime</label>
-                                                <div class="col-xs-8">
-                                                    <input  class="form-control" type="text" id="firstName" name="firstName" th:value="*{firstName}" />
-                                                </div>                                                
-                                                <label class="control-label col-xs-4" for="lastName">Priimek</label>
-                                                <div class="col-xs-8">
-                                                    <input  class="form-control" type="text" id="lastName" name="lastName" th:value="*{lastName}" />
-                                                </div>                                                
-                                                <label class="control-label col-xs-4" for="email">E-Pošta</label>
-                                                <div class="col-xs-8">
-                                                    <input  class="form-control" type="email" id="email" name="email" th:value="*{email}" />
-                                                </div>
-                                                <label class="control-label col-xs-4"  for="phone">Telefon</label>
-                                                <div class="col-xs-8">
-                                                    <input  class="form-control" type="text" id="phone" name="phone" th:value="*{phone}" />
-                                                </div>
-                                                <label class="control-label col-xs-4"  for="birthdate">Datum rojstva</label>
-                                                <div class="col-xs-8 ">
-                                                    <input  class="form-control" type="text" id="birthdate" 
-                                                                name="birthdate" th:value="*{{birthDate}}" 
-                                                                th:field="*{{birthDate}}"/>
-                                                </div>
-                                                <label class="control-label col-xs-4"  for="gemder">Spol</label>
-                                                <div class="col-xs-8">
-                                                    <select class="form-control col-xs-8" id="gender"
-                                                            name="gender" th:field="*{gender}">
-                                                        <option th:each="gender : ${T(si.bvukic.telehealth.core.model.Gender).values()}" 
-                                                                th:value="${gender}" 
-                                                                th:text="${gender.displayName}"></option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">Vloge</div>
-                                            <div th:each="role : ${allRoles}">
-                                                <input type="checkbox" th:id="${{role}}" th:value="${{role}}" th:field="*{roles}" />
-                                                <label th:for="${{role}}" th:text="${role.name}">Anonymous</label>
-                                            </div>
-                                        </div>
-                                    </div>
+
+                                <!-- Import input fields -->
+                                <div th:replace="partial/userForm.html :: fields"></div>
+                                <div>
+                                    <a class="btn btn-default" href="#" th:href="@{/users}">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Prekliči
+                                    </a>
+                                    <button th:if="${user.id} != null" class="btn btn-primary" type="submit">
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Shrani
+                                    </button>
+                                    <button th:if="${user.id} == null" class="btn btn-primary" type="submit">
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Dodaj
+                                    </button>
                                 </div>
-                                <a class="btn btn-default" href="#" th:href="@{/users}">
-                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Prekliči
-                                </a>
-                                <button th:if="${user.id} != null" class="btn btn-primary" type="submit">
-                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Shrani
-                                </button>
-                                <button th:if="${user.id} == null" class="btn btn-primary" type="submit">
-                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Dodaj
-                                </button>
                             </form>
                         </div>
                     </div>

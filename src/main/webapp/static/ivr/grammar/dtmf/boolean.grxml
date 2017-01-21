@@ -24,8 +24,6 @@ and open the template in the editor.
         <one-of>
             <item>0</item>
             <item>1</item>
-            <item>*<tag>this.$result='0'</tag></item>
-            <item>#<tag>this.$result='1'</tag></item>
         </one-of>
     </rule>
 

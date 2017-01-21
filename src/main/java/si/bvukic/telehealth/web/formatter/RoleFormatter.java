@@ -33,11 +33,12 @@ public class RoleFormatter implements Formatter<Role> {
         
 	@Override
 	public String print(Role role, Locale locale) {
-		return role.getId().toString();
+		return "role_" + role.getId().toString();
 	}
 
 	@Override
 	public Role parse(String id, Locale locale) throws ParseException {
+            id = id.replace("role_", "");
             try {
 		Role role = roleService.getRoleById(Long.parseLong(id));
 		return role;

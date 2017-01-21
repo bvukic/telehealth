@@ -15,29 +15,25 @@ and open the template in the editor.
     <catch th:replace="vxml/partial/catch-disconnect.xml :: logout"></catch>
 
     <var name="confirmValue"/>
+
     <var name="parameter" th:attr="expr='\'' + ${parameter.getName()} + '\''"/>
     <var name="min" th:attr="expr=${parameter.getDataValueMin()}"/>
     <var name="max" th:attr="expr=${parameter.getDataValueMax()}"/>
     <var name="step" th:attr="expr=${parameter.getDataValueStep()}"/>
 
     <form id="input">
-        <property name="interdigittimeout" value="3s"/>
-        <property name="termtimeout" value="10s"/>
-        <var name="playHelp" expr="false"/>
+        <property th:if="${parameter.getDataType().toString()} == 'NUMERIC'" name="interdigittimeout" value="5s"/>
+        <property th:if="${parameter.getDataType().toString()} == 'NUMERIC'" name="termtimeout" value="20s"/>
         <block>
             <log label="info" th:attr="expr='Data input for pramater ' + parameter "/>
         </block>
 
         <field name="value">
             <!-- OSR needs the absolut url to load the grxml file-->
-            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/voice/} + ${parameter.getDataType().getGrammar()}"/>
-            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/dtmf/} + ${parameter.getDataType().getGrammar()}"/>
-
+            <grammar th:attr="src=${grxmlServer} + @{/static/ivr/grammar/voice/} + ${parameter.getDataType().getGrammar()}"/>
+            <grammar th:attr="src=${grxmlServer} + @{/static/ivr/grammar/dtmf/} + ${parameter.getDataType().getGrammar()}"/>
             <prompt bargein="true">
                 <audio th:attr="src=@{/static/ivr/media/medical/} + ${parameter.getVoicePrompt()}"/>
-            </prompt>
-            <prompt bargein="true" cond="playHelp">
-                <audio th:attr="src=@{/static/ivr/media/system/input_numeric_help.wav}"/>
             </prompt>
 
             <filled>
@@ -54,22 +50,34 @@ and open the template in the editor.
             </filled>
 
             <noinput>
-                <assign name="playHelp" expr="true"/>
                 <audio th:attr="src=@{/static/ivr/media/system/input_value_null.wav}"/>
-                <reprompt/>
+                <goto next="#input_help"/>
             </noinput>
             <nomatch>
                 <clear namelist="value"/>
-                <assign name="playHelp" expr="true"/>
                 <audio th:attr="src=@{/static/ivr/media/system/input_value_wrong.wav}"/>
-                <reprompt/>
+                <goto next="#input_help"/>
             </nomatch>
         </field>
     </form>
 
+    <form id="input_help">
+        <block>
+            <prompt bargein="true">
+                <audio th:if="${parameter.getDataType().toString()} == 'NUMERIC'" th:attr="src=@{/static/ivr/media/say/numeric/help.wav}"/>
+                <audio th:if="${parameter.getDataType().toString()} == 'BOOLEAN'" th:attr="src=@{/static/ivr/media/say/boolean/help.wav}"/>
+                <audio th:if="${parameter.getDataType().toString()} == 'SCALE_ARGUMENT'" th:attr="src=@{/static/ivr/media/say/argument/help.wav}"/>
+                <audio th:if="${parameter.getDataType().toString()} == 'SCALE_CONDITION'" th:attr="src=@{/static/ivr/media/say/condition/help.wav}"/>
+                <audio th:if="${parameter.getDataType().toString()} == 'SCALE_QUANTITY'" th:attr="src=@{/static/ivr/media/say/quantity/help.wav}"/>
+                <audio th:if="${parameter.getDataType().toString()} == 'SCALE_FREQUENCY'" th:attr="src=@{/static/ivr/media/say/frequency/help.wav}"/>
+            </prompt>
+            <goto next="#input"/>
+        </block>
+    </form>
+
     <form id="confirm">
         <var name="value" expr="confirmValue"/>
-        <var name="playHelp" expr="false"/>
+
         <block>
             <prompt bargein="true">
                 <audio th:attr="src=@{/static/ivr/media/system/input_data_confirm_pre.wav}"/>
@@ -84,14 +92,12 @@ and open the template in the editor.
             </prompt>
         </block>
 
+
+
         <field name="confirmed">
             <!-- OSR needs the absolut url to load the grxml file-->
-            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/voice/boolean.grxml}"/>
-            <grammar th:attr="src=${publicSiteUrl} + @{/static/ivr/grammar/dtmf/boolean.grxml}"/>
-
-            <prompt bargein="true" cond="playHelp">
-                <audio th:attr="src=@{/static/ivr/media/system/input_data_confirm_help.wav}"/>
-            </prompt>
+            <grammar th:attr="src=${grxmlServer} + @{/static/ivr/grammar/voice/confirm.grxml}"/>
+            <grammar th:attr="src=${grxmlServer} + @{/static/ivr/grammar/dtmf/confirm.grxml}"/>
 
             <filled>
                 <log label="info" expr="'Recognized input: ' + confirmed"/>
@@ -99,12 +105,10 @@ and open the template in the editor.
                 <if cond="confirmed == 0">
                     <log label="info" expr="'User did not confirm the value ' + value ' . Returning to input...'"/>
                     <goto next="#input"/>
-
                     <elseif cond="confirmed == 1"/>
                     <log label="info" expr="'User confirmed value ' + value"/>
                     <log label="info" expr="'Storing value ' + value"/>
                     <submit th:attr="next=@{/api/vxml/input/store/} + ${index}" method="GET" namelist="value"/>
-
                     <else/>
                     <log label="error" expr="Confirmed value is invalid"/>
                     <throw event="nomatch"/>
@@ -112,17 +116,26 @@ and open the template in the editor.
             </filled>
 
             <noinput>
-                <assign name="playHelp" expr="true"/>
+                <clear namelist="confirmed"/>
                 <audio th:attr="src=@{/static/ivr/media/system/input_value_null.wav}"/>
-                <goto next="#confirm"/>
+                <goto next="#confirm_help"/>
             </noinput>
             <nomatch>
                 <clear namelist="confirmed"/>
-                <assign name="playHelp" expr="true"/>
                 <audio th:attr="src=@{/static/ivr/media/system/input_value_wrong.wav}"/>
-                <goto next="#confirm"/>
+                <goto next="#confirm_help"/>
             </nomatch>
         </field>
+
+    </form>
+
+    <form id="confirm_help">
+        <block>
+            <prompt bargein="true">
+                <audio th:attr="src=@{/static/ivr/media/system/help_confirm.wav}"/>
+            </prompt>
+            <goto next="#confirm"/>
+        </block>
     </form>
 
 </vxml>

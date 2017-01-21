@@ -69,7 +69,7 @@ public class User extends GenericEntity implements UserDetails {
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
      
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @Cascade({CascadeType.MERGE})
     @JoinTable(name = "user_role", 
                 joinColumns = {@JoinColumn(name = "user_id")}, 

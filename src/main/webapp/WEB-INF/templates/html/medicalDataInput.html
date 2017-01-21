@@ -12,7 +12,7 @@ and open the template in the editor.
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Vnos podatkov</title>
+        <title>TeleZdravje: Vnos</title>
         <link href="/static/web/css/bootstrap.min.css"
               th:href="@{/static/web/css/bootstrap.min.css}"
               rel="stylesheet" media="screen" />
@@ -52,7 +52,7 @@ and open the template in the editor.
                             <div class="page-header">
                                 <h3>Vnos podatkov <small>Čarovnik za vnos podatkov</small></h3>
                             </div>
-                            <!-- Displaz if data is up to date -->
+                            <!-- Display if data is up to date -->
                             <div th:if="${upToDate}" class="panel panel-success">
                                 <div class="panel-heading">Vnos ni potreben</div>
                                 <div class="panel-body">
@@ -75,9 +75,10 @@ and open the template in the editor.
                                     </button>
                                 </form>
                             </div>
-                            <!-- Dusokay if not complete and not upToDate than user can enter medical data -->
-                            <div th:if="!${complete} and !${upToDate}"> 
-                                <div th:replace="partial/dataInputForms.html :: numeric"></div>                             
+                            <!-- Display if not complete and not upToDate than user can enter medical data -->
+                            <div th:if="!${complete} and !${upToDate}">
+                                <script th:replace="partial/dataInputForms.html :: validate"></script>
+                                <div th:replace="partial/dataInputForms.html :: form"></div>                             
                             </div>
                         </div>
                     </div>

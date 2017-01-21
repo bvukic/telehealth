@@ -4,26 +4,55 @@
 
     <groupId>si.bvukic</groupId>
     <artifactId>telehealth</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
     <packaging>war</packaging>
 
     <name>telehealth</name>
 
 
-    <properties>    
+    <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java-version>1.8</java-version>
-        <org.springframework-version>4.2.4.RELEASE</org.springframework-version>
+        <org.springframework-version>4.3.4.RELEASE</org.springframework-version>
         <org.springframework.security-version>3.2.3.RELEASE</org.springframework.security-version>
-        <thymeleaf.version>3.0.0.BETA03</thymeleaf.version>
+        <thymeleaf.version>3.0.1.RELEASE</thymeleaf.version>
         <org.aspectj-version>1.8.8</org.aspectj-version>
         <org.slf4j-version>1.7.13</org.slf4j-version>
         <hibernate.version>4.3.11.Final</hibernate.version>
+        <hibernate-validator.version>5.3.4.Final</hibernate-validator.version>
     </properties>
-
     
+        <profiles>
+        <!-- production and development profiles are not public -->
+        <profile>
+            <id>template</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <log4j.xml.telehealthLogger.level>debug</log4j.xml.telehealthLogger.level>
+                <log4j.xml.rootLogger.level>info</log4j.xml.rootLogger.level>
+                <log4j.xml.rootLogger.appender>file</log4j.xml.rootLogger.appender>
+                <log4j.xml.file>/var/log/telehealth/telehealth.log</log4j.xml.file>
+                <app.db.url>jdbc:mysql://localhost:3306/telehealth?characterEncoding=UTF-8</app.db.url>
+                <app.db.username>dummy</app.db.username>
+                <app.db.password>secret</app.db.password>
+                <app.email.smtp.server>smtp.gmail.com</app.email.smtp.server>
+                <app.email.smtp.port>587</app.email.smtp.port>
+                <app.email.smtp.enabletls>true</app.email.smtp.enabletls>
+                <email.smtp.authentication>true</email.smtp.authentication>
+                <app.email.smtp.username>dummy@gmail.com</app.email.smtp.username>
+                <app.email.smtp.password>secret</app.email.smtp.password>
+                <app.email.from.address>bostjan.vukic@gmail.com</app.email.from.address>
+                <app.email.from.name>Boštjan Vukič</app.email.from.name>
+                <app.grxml.server.address>http://telezdravje.si:80</app.grxml.server.address>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <dependencies>
         <!-- Spring -->
         <dependency>
@@ -48,13 +77,18 @@
             <artifactId>spring-tx</artifactId>
             <version>${org.springframework-version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.18.1-GA</version> 
+            <version>3.18.1-GA</version>
         </dependency>
-        
+
+        <!-- Thymeleaf: template engine for html/web and vxml/ivr -->
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
@@ -77,13 +111,13 @@
             <version>${thymeleaf.version}</version>
             <scope>compile</scope>
         </dependency>
-        
+
         <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
             <version>${org.springframework.security-version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
@@ -94,8 +128,34 @@
             <artifactId>spring-security-web</artifactId>
             <version>${org.springframework.security-version}</version>
         </dependency>
-         
-        <!-- Hibernate -->
+
+        <!-- mail libs-->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>jaf</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        -->
+
+        <!-- Velocity: template engine for emails -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-tools</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <!-- Hibernate: for ORM support -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -105,6 +165,11 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
         </dependency>
         <!-- Apache Commons DBCP -->
         <dependency>
@@ -118,14 +183,14 @@
             <artifactId>spring-orm</artifactId>
             <version>${org.springframework-version}</version>
         </dependency>
-                 
+
         <!-- AspectJ -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${org.aspectj-version}</version>
-        </dependency> 
-         
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -168,14 +233,14 @@
             </exclusions>
             <scope>runtime</scope>
         </dependency>
- 
+
         <!-- @Inject -->
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-                 
+
         <!-- Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -194,7 +259,7 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-     
+
         <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
@@ -202,13 +267,14 @@
             <version>4.7</version>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- Driver for mysql database -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.38</version>
         </dependency>
+        
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
@@ -316,9 +382,25 @@
                             <arguments>--verbose</arguments>
                         </configuration>
                     </execution>
-                </executions>            
+                </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/webapp/WEB-INF</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
     </build>
 
 </project>

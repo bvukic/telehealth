@@ -8,11 +8,13 @@ package si.bvukic.telehealth.core.model;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.Filters;
@@ -51,7 +53,7 @@ public class MedicalData extends AuditEntity {
     @JoinColumn(name="user_id", nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private User user;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="medicalparameter_id", nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private MedicalParameter medicalParameter;
 
@@ -82,7 +84,19 @@ public class MedicalData extends AuditEntity {
     public void setUser(User user) {
         this.user = user;
     }
-
+    
+    @Transient
+    public boolean isValueValid() {
+        float min = medicalParameter.getDataValueMin();
+        float max = medicalParameter.getDataValueMax();
+        return (dataValue >= min && dataValue  <= max);
+    }
+    
+    @Transient
+    public void setDefaultValue() {
+        dataValue = medicalParameter.getDataValueDefault();;
+    }
+    
     public void setMedicalParameter(MedicalParameter medicalParameter) {
         this.medicalParameter = medicalParameter;
     }

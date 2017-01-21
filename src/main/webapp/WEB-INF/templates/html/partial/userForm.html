@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="si"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags">
+    <head>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>User Form</title>
+        <link href="/static/web/css/bootstrap.min.css"
+              th:href="@{/static/web/css/bootstrap.min.css}"
+              rel="stylesheet" media="screen" />
+        <link href="/static/web/css/theme.css"
+              th:href="@{/static/web/css/theme.css}"
+              rel="stylesheet" media="screen" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,700"
+              rel="stylesheet' type='text/css"/>
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <script src="/static/web/js/jquery.min.js"
+        th:src="@{/static/web/js/jquery.min.js}"></script>
+        <script src="/static/web/js/bootstrap.min.js"
+        th:src="@{/static/web/js/bootstrap.min.js}"></script>
+        <script src="/static/web/js/bootstrap-datepicker.min.js"
+        th:src="@{/static/web/js/bootstrap-datepicker.min.js}"></script>
+    </head>
+    <body>
+        <div th:fragment="validation">
+            <script th:if="${user.id} == null">
+                var allowNullPassword = false;
+                var doUsernameValidation = true;
+            </script>
+            <script th:if="${user.id} != null">
+                var allowNullPassword = true;
+                var doUsernameValidation = false;
+            </script>
+            <script>
+                var usernameRegex = /^[A-Za-z0-9_-]{3,16}$/;
+                var emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+                var phoneRegex = /^0\d{8}$/;
+                var birthdateRegex = /^[0-3][0-9]\.[01][0-9]\.[12]\d{3}/;
+                /* because some browsers do not support event.keyCode we can not check if user pressed
+                 backspace. Insted we check value lenght aginest previuous value length*/
+                var birthdatePrevLength = 0;
+
+                function validateUsername() {
+                    var username = document.forms.userForm.username;
+                    var usernameHint = document.getElementById('username_hint');
+                    var status = {sucess: true, message: ''};
+                    if (!usernameRegex.test(username.value)) {
+                        status.sucess = false;
+                        status.message = 'Neveljaveno uporabniško ime!';
+                    }
+                    usernameHint.innerHTML = status.message;
+                    return status;
+                }
+
+                function validateBirthdate() {
+                    var birthdate = document.forms.userForm.birthdate;
+
+                    if (birthdate.value.length > birthdatePrevLength) {
+                        console.log('Automatic date formating')
+                        birthdate.value = birthdate.value.replace(/ /, '');
+                        birthdate.value = birthdate.value.replace(/^[4-9]$/, '0' + birthdate.value);
+                        birthdate.value = birthdate.value.replace(/^[0-3][1-9]$/, birthdate.value + '.');
+                        birthdate.value = birthdate.value.replace(/^[1-9]\.$/, '0' + birthdate.value);
+                        birthdate.value = birthdate.value.replace(/^[0-3][1-9]\.[2-9]$/,
+                                birthdate.value.substring(0, birthdate.value.length - 1)
+                                + '0' + birthdate.value.substring(birthdate.value.length - 1));
+                        birthdate.value = birthdate.value.replace(/^[0-3][0-9]\.[0-1][0-9]$/, birthdate.value + '.');
+                        birthdate.value = birthdate.value.replace(/^[0-3][1-9]\.[1-9]\.$/,
+                                birthdate.value.substring(0, birthdate.value.length - 2)
+                                + '0' + birthdate.value.substring(birthdate.value.length - 2));
+                    }
+                    birthdatePrevLength = birthdate.value.length;
+                    var birthdateHint = document.getElementById('birthdate_hint');
+                    var status = {sucess: true, message: ''};
+
+
+
+                    if (!birthdateRegex.test(birthdate.value)) {
+                        status.sucess = false;
+                        status.message = 'Neveljaven datum! Upodarbite obliko dd.mm.llll';
+                    }
+
+                    birthdateHint.innerHTML = status.message;
+                    return status;
+                }
+
+                function validateEmail() {
+                    var email = document.forms.userForm.email;
+                    var emailHint = document.getElementById('email_hint');
+                    var status = {sucess: true, message: ''};
+                    if (!emailRegex.test(email.value)) {
+                        status.sucess = false;
+                        status.message = 'Neveljaven e-pošntni naslov!';
+                    }
+                    emailHint.innerHTML = status.message;
+                    return status;
+                }
+
+                function validatePhone() {
+                    var phone = document.forms.userForm.phone;
+                    phone.value = phone.value.replace(/ /, '');
+                    phone.value = phone.value.replace(/\-/, '');
+                    phone.value = phone.value.replace(/^\+?386/, '0');
+                    phone.value = phone.value.replace(/^00386/, '0');
+                    var phoneHint = document.getElementById('phone_hint');
+                    var status = {sucess: true, message: ''};
+                    if (!phoneRegex.test(phone.value)) {
+                        status.sucess = false;
+                        status.message = 'Neveljavna telefonska številka!';
+                    }
+                    phoneHint.innerHTML = status.message;
+                    return status;
+                }
+
+                function validatePassword() {
+                    var password = document.forms.userForm.password;
+                    var passwordConfirm = document.forms.userForm.password_confirm;
+                    var passwordHint = document.getElementById('password_hint');
+                    var status = {sucess: true, message: ''};
+
+                    if (!(allowNullPassword
+                            && password.value === null || password.value === ''
+                            && passwordConfirm.value === null || passwordConfirm.value === '')) {
+                        if (password.value.length < 6) {
+                            status.sucess = false;
+                            status.message = 'Geslo mora biti dolgo vsaj 6 znakov!';
+                        } else if (password.value != passwordConfirm.value) {
+                            status.sucess = false;
+                            status.message = 'Gesli se ne ujemata!';
+                        } else {
+                            status.sucess = true;
+                            status.message = '';
+                        }
+                    }
+                    passwordHint.innerHTML = status.message;
+                    return status;
+                }
+
+                function validate(event) {
+                    event.preventDefault();
+                    if (doUsernameValidation) {
+                        usernameStatus = validateUsername();
+                        if (usernameStatus.sucess !== true) {
+                            alert(usernameStatus.message);
+                            return false;
+                        }
+                    }
+                    passwordStatus = validatePassword();
+                    if (passwordStatus.sucess !== true) {
+                        alert(passwordStatus.message);
+                        return false;
+                    }
+                    emailStatus = validateEmail();
+                    if (emailStatus.sucess !== true) {
+                        alert(emailStatus.message);
+                        return false;
+                    }
+                    phoneStatus = validatePhone();
+                    if (phoneStatus.sucess !== true) {
+                        alert(phoneStatus.message);
+                        return false;
+                    }
+                    birthdateStatus = validateBirthdate(null);
+                    if (birthdateStatus.sucess !== true) {
+                        alert(birthdateStatus.message);
+                        return false;
+                    }
+                    document.forms["userForm"].submit();
+                }
+            </script>
+        </div>
+
+        <form name="userForm" th:object="${user}" action="#"
+              th:action="#" method="POST" onSubmit="return validate(event);"
+              class="form-horizontal">
+            <div th:fragment="fields">
+
+                <div th:if="${isError}">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">Napaka</div>
+                        <div class="panel-body">
+                            <ul>
+                                <li th:if="${errorUsernameFormat}">Uporabniško ime ni veljavno.</li>
+                                <li th:if="${errorUsernameTaken}">Uporabniško ime je že zasedeno. Izberite drugo uporabniško ime.</li>
+                                <li th:if="${errorPasswordTooShort}">Geslo mora biti dolgo vsaj 6 znakov.</li>
+                                <li th:if="${errorPhoneFormat}">Telefonska številka ni veljavna. Številko vpišite v lokalnem formatu, na primer 041700700.</li>
+                                <li th:if="${errorPhoneTaken}">Telefonska številka, ki ste jo uporabili je že registrirana. Vpišite drugo telefonsko številko.</li>
+                                <li th:if="${errorEmailFormat}">E-poštni naslov ni ustrezne oblike. Vpišite veljaven e-poštni naslov.</li>
+                                <li th:if="${errorMedicalConditionsEmpty}">Bolezen ni izbrana. Izberite vsaj eno bolezen.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <div class="col-sm-7 col-lg-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Podatki</div>
+                            <div class="panel-body">
+                                <div>
+                                    <input type="hidden" id="id" th:field="*{id}" />
+                                    <input type="hidden" id="version" th:field="*{version}" />
+                                </div>
+                                <!-- Only administrators can enable/disable users -->
+                                <div sec:authorize="hasRole('ROLE_PERMISSION_administration_users')">
+                                    <label class="control-label col-xs-12 col-sm-5 col-lg-5" for="enabled">Omogočen</label>
+                                    <div class="col-xs-12 col-sm-7 col-lg-7">
+                                        <input class="form-control" type="checkbox" id="enabled" name="enabled" th:checked="*{enabled}" />
+                                    </div>
+                                </div>
+                                <label th:if="${user.id} == null" class="control-label col-xs-12 col-sm-5 col-lg-5" for="username">Uporabniško ime</label>
+                                <div th:if="${user.id} == null" class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="text" id="username" name="username" th:value="*{username}" onkeyup="validateUsername(); return false;"/>
+                                    <span id='username_hint' class="text-danger"></span>
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5" for="password">Geslo </label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="password" id="password" name="password" th:value="*{password}" onkeyup="validatePassword();
+                                            return false;"/>
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5" for="password_confirm">Potrdi geslo </label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="password" id="password_confirm" name="password_confirm" onkeyup="validatePassword();
+                                            return false;"/>
+                                    <span id='password_hint' class="text-danger"></span>
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5" for="firstName">Ime</label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="text" id="firstName" name="firstName" th:value="*{firstName}" />
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5" for="lastName">Priimek</label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="text" id="lastName" name="lastName" th:value="*{lastName}" />
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5" for="email">E-Pošta</label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="email" id="email" name="email" th:value="*{email}" onkeyup="validateEmail(); return false;"/>
+                                    <span name="email_hint" id="email_hint" class="text-danger"></span>
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5"  for="phone">Telefon</label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="tel" id="phone" name="phone" th:value="*{phone}" onkeyup="validatePhone(); return false;"/>
+                                    <span name='phone_hint' id='phone_hint' class="text-danger"></span>
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5"  for="birthdate">Datum rojstva</label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <input  class="form-control" type="text" id="birthdate"
+                                            name="birthdate" th:value="*{{birthDate}}" th:field="*{{birthDate}}" onkeyup="validateBirthdate(event)"/>
+                                    <span name='phone_hint' id='birthdate_hint' class="text-danger"></span>
+                                </div>
+                                <label class="control-label col-xs-12 col-sm-5 col-lg-5"  for="gemder">Spol</label>
+                                <div class="col-xs-12 col-sm-7 col-lg-7">
+                                    <select class="form-control col-xs-8" id="gender"
+                                            name="gender" th:field="*{gender}">
+                                        <option th:each="gender : ${T(si.bvukic.telehealth.core.model.Gender).values()}"
+                                                th:value="${gender}"
+                                                th:text="${gender.displayName}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-5 col-lg-6" >
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Bolezni</div>
+                            <div class="panel-body">
+                                <div th:each="condition : ${allMedicalConditions}">
+                                    <input type="checkbox" th:id="${{condition}}" th:value="${{condition}}" th:field="*{medicalConditions}" />
+                                    <label th:for="${{condition}}" th:text="${condition.name}">Some condition</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Only administrators can set user's roles -->
+                    <div sec:authorize="hasRole('ROLE_PERMISSION_administration_users')">
+                        <div class="col-sm-5 col-lg-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Vloge</div>
+                                <div class="panel-body">
+                                    <div th:each="role : ${allRoles}">
+                                        <input type="checkbox" th:mame="${{role}}" th:id="${{role}}" th:value="${{role}}" th:field="*{roles}" />
+                                        <label th:for="${{role}}" th:text="${role.name}">Anonymous</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-6">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:fragment="actions">
+                <a class="btn btn-default" href="#">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Prekliči
+                </a>
+                <button th:if="${user.id} != null" class="btn btn-primary" type="submit">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Shrani
+                </button>
+                <button th:if="${user.id} == null" class="btn btn-primary" type="submit">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Dodaj
+                </button>
+            </div>
+        </form>
+    </body>
+</html>

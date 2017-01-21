@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -30,22 +33,26 @@ import si.bvukic.telehealth.core.service.UserService;
  * @author bostjanvukic
  */
 @Controller
+@PropertySource("classpath:application.properties")
 public class IvrInputController {
     private static final Logger LOG = LoggerFactory.getLogger(IvrInputController.class);
     private final UserService userService;
     private final MedicalDataService medicalDataService;
     private final MedicalParameterService medicalParameterService;
+    private final Environment environment;
     
     @Autowired
     public IvrInputController(UserService userService, 
             MedicalDataService medicalDataService,
-            MedicalParameterService medicalParameterService) {
+            MedicalParameterService medicalParameterService,
+            Environment environment) {
         this.userService = userService;
         this.medicalDataService = medicalDataService;
         this.medicalParameterService = medicalParameterService;
+        this.environment = environment;
     }
 
-    
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_input')")
     @RequestMapping(value = "/api/vxml/input", method = RequestMethod.GET )
     public String initData(Model model, HttpServletRequest request) {
         
@@ -68,7 +75,7 @@ public class IvrInputController {
         return "vxml/input-init.xml";
     }
     
-    
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_input')")
     @RequestMapping(value = "/api/vxml/input/load/{index}", 
             method = RequestMethod.GET )
     public String loadData(@PathVariable("index") int index, 
@@ -82,13 +89,14 @@ public class IvrInputController {
         LOG.debug("Loading data {}, index {}", dataList.get(index).getMedicalParameter().getName(), index);
         model.addAttribute("index", index);
         model.addAttribute("parameter", dataList.get(index).getMedicalParameter());
-        model.addAttribute("publicSiteUrl","http://www.bosti.org:80");
+        model.addAttribute("grxmlServer", environment.getRequiredProperty("grxml.server"));
+        //model.addAttribute("grxmlServer", "http://www.bosti.org:80");
         
         return "vxml/input-form.xml";
         
     }
 
-    
+    @PreAuthorize("hasRole('ROLE_PERMISSION_data_input')")
     @RequestMapping(value = "/api/vxml/input/store/{index}", 
             method = RequestMethod.GET )
     public String storeData(@PathVariable("index") int index, 

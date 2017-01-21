@@ -5,7 +5,7 @@
     <!-- Appenders -->
     <!-- File log appender -->
     <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="c:\\temp\\telehealth\\telehealth.log" />
+        <param name="File" value="${log4j.xml.file}" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%-5p %d %c{1}:%L %M - %m%n"/>          
@@ -21,7 +21,7 @@
 	
     <!-- Application Loggers -->
     <logger name="si.bvukic.telehealth">
-        <level value="debug" />
+        <level value="${log4j.xml.telehealthLogger.level}" />
     </logger>
         
                 
@@ -53,9 +53,8 @@
         
     <!-- Root Logger -->
     <root>
-        <priority value="info" />
-        <appender-ref ref="console" />
-        <appender-ref ref="file" />
+        <priority value="${log4j.xml.rootLogger.level}" />
+        <appender-ref ref="${log4j.xml.rootLogger.appender}" />
     </root>
 	
 </log4j:configuration>

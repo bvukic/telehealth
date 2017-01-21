@@ -28,14 +28,55 @@ and open the template in the editor.
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
         <script src="/static/web/js/jquery.min.js"
-                th:src="@{/static/web/js/jquery.min.js}"></script>
+        th:src="@{/static/web/js/jquery.min.js}"></script>
         <script src="/static/web/js/bootstrap.min.js"
-                th:src="@{/static/web/js/bootstrap.min.js}"></script>
+        th:src="@{/static/web/js/bootstrap.min.js}"></script>
     </head>
     <body>
-        <div th:fragment="numeric">
-            <form th:object="${data}" action="/data/input" method="POST"
-                    id="dataInputForm" name="dataInputForm" class="form-horizontal">
+        <script type="text/javascript" th:fragment="validate" th:inline="javascript">
+            var dataType = /*[[${data.medicalParameter.dataType.toString()}]]*/ 'NUMERIC';
+            
+            var inputRegex =  /^\d{1,}\.?\d{0,}$/;
+            /* because some browsers do not support event.keyCode we can not check if user pressed
+             backspace. Insted we check value lenght aginest previuous value length*/
+            var inputLength = 0;
+
+            function validateInput(itemId, hintId) {
+                var input = document.getElementById(itemId);
+                console.log("VALUE: " + input.value);
+
+                if (input.value.length > inputLength) {
+                    input.value = input.value.replace(/,/, '.');
+                }
+
+                inputLength = input.value.length;
+                var inputHint = document.getElementById(hintId);
+                var status = {sucess: true, message: ''};
+
+                if (!inputRegex.test(input.value)) {
+                    status.sucess = false;
+                    status.message = 'Vnesite le številke.';
+                }
+                inputHint.innerHTML = status.message;
+                return status;
+            }
+
+            function validate(event) {
+                event.preventDefault();
+                if (dataType == 'NUMERIC') {
+                    inputStatus = validateInput('data_value', 'hint');
+                    console.log(JSON.stringify(inputStatus));
+                    if (inputStatus.sucess !== true) {
+                        alert(inputStatus.message);
+                        return false;
+                    }
+                }
+                document.getElementById('inputForm').submit();
+            }
+        </script>
+        <div th:fragment="form">
+            <form id="inputForm" name="inputForm" th:object="${data}" action="/data/input" method="POST"
+                  class="form-horizontal" onSubmit="return validate(event);">
                 <div class="row" th:fragment="inputPanel">
                     <div class="col-lg-12">
                         <div class="panel panel-default">
@@ -49,104 +90,122 @@ and open the template in the editor.
                                     </p>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-lg-12">                                
+                                    <div class="form-group col-lg-12">
                                         <div>
                                             <input type="hidden" id="id" th:field="*{id}" />
                                         </div>
-                                        <label class="control-label col-xs-4" for="value" th:text="*{medicalParameter.dataValueLabel}">
+                                        <label class="control-label col-xs-4" for="dataValue" th:text="*{medicalParameter.dataValueLabel}">
                                             Parameter Name
                                         </label>
                                         <div class="col-xs-4" th:if="*{medicalParameter.dataType.toString()} eq 'NUMERIC'">
                                             <input type="hidden" id="id" th:field="*{id}" />
                                             <input type="hidden" id="version" th:field="*{version}" />
-                                            <input th:if="*{dataValue} eq null"
-                                                  class="form-control" type="number" id="dataValue" name="dataValue" reqiored="true"
-                                                      th:value="*{medicalParameter.dataValueDefault}" 
-                                                      th:field="*{dataValue}" 
-                                                      th:attr="step=*{medicalParameter.dataValueStep}, 
-                                                            min=*{medicalParameter.dataValueMin},
-                                                            max=*{medicalParameter.dataValueMax}" />
-                                            <input th:if="!(*{dataValue} eq null)" 
-                                                  class="form-control" type="number" id="dataValue" name="dataValue" reqiored="true"
-                                                      th:value="*{dataValue}" 
-                                                      th:field="*{dataValue}" 
-                                                      th:attr="step=*{medicalParameter.dataValueStep}, 
-                                                            min=*{medicalParameter.dataValueMin},
-                                                            max=*{medicalParameter.dataValueMax}" />
+                                            <input class="form-control" type="number" id="data_value" name="dataValue" reqiored="true"
+                                                   th:value="*{dataValue}"
+                                                   th:attr="step=*{medicalParameter.dataValueStep},
+                                                   min=*{medicalParameter.dataValueMin},
+                                                   max=*{medicalParameter.dataValueMax}"
+                                                   onkeyup="validateInput('data_value','hint'); return false;"></input>
                                         </div>
                                         <div class="col-xs-4 radio" th:if="*{medicalParameter.dataType.toString()} eq 'BOOLEAN'">
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="0"/>Ne</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="1"/>Da</label>
-                                          </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="0"/>Ne</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="1"/>Da</label>
+                                            </div>
                                         </div>
                                         <div class="col-xs-4" th:if="*{medicalParameter.dataType.toString()} eq 'SCALE_CONDITION'">
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="0"/>Zelo slabo</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="1"/>Slabo</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="2"/>Srednje</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="3"/>Dobro</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="4"/>Zelo dobro</label>
-                                          </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="0"/>Zelo slabo</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="1"/>Slabo</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="2"/>Srednje</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="3"/>Dobro</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="4"/>Zelo dobro</label>
+                                            </div>
                                         </div>
                                         <div class="col-xs-4 radio" th:if="*{medicalParameter.dataType.toString()} eq 'SCALE_ARGUMENT'">
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="0"/>Ne drži</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="1"/>Niti ne drži, niti drži</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="2"/>Drži</label>
-                                          </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="0"/>Splog ne drži</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="1"/>Ne drži</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="2"/>Niti ne drži, niti drži</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="3"/>Drži</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="4"/>Zelo drži</label>
+                                            </div>
                                         </div>
                                         <div class="col-xs-4 radio" th:if="*{medicalParameter.dataType.toString()} eq 'SCALE_QUANTITY'">
                                             <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="0"/>Nič</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="1"/>Malo</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="2"/>Srednje</label>
-                                          </div>
-                                          <div class="radio">
-                                            <label><input type="radio" th:field="*{dataValue}" value="3"/>Veliko</label>
-                                          </div>
-                                        </div>                                        
-                                        <label class="control-label text-left col-xs-4" for="value" th:text="*{medicalParameter.dataValueUnit}">
+                                                <label><input type="radio" th:field="*{dataValue}" value="0"/>Nič</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="1"/>Malo</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="2"/>Srednje</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="3"/>Veliko</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="4"/>Zelo veliko</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 radio" th:if="*{medicalParameter.dataType.toString()} eq 'SCALE_FREQUENCY'">
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="0"/>Nikoli</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="1"/>Redko</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="2"/>Srednje</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="3"/>Pogosto</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" th:field="*{dataValue}" value="4"/>Vedno</label>
+                                            </div>
+                                        </div>
+                                        <label class="col-xs-4" style="padding-top: 10px;" for="dataValue" th:text="*{medicalParameter.dataValueUnit}">
                                             Unit
                                         </label>
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <span class="text-danger text-center col-lg-12" id="hint" name="hint"></span>
                                     <p class="text-danger text-center col-lg-12" th:if="${error}" th:text="${error}">
-                                        Napaka
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button th:if="${index} != 0" class="btn btn-danger" type="submit" 
-                        th:onclick="'$(\'#dataInputForm\').attr(\'action\', \'' + @{/data/input/} + ${index}  + '/previous\')'">
+                <button th:if="${index} != 0" class="btn btn-danger" type="submit"
+                        th:onclick="'$(\'#inputForm\').attr(\'action\', \'' + @{/data/input/} + ${index}  + '/previous\')'">
                     <span class="glyphicon glyphicon-backward" aria-hidden="true"></span> Nazaj
                 </button>
                 <button class="btn btn-primary pull-right" type="submit"
-                        th:onclick="'$(\'#dataInputForm\').attr(\'action\', \'' + @{/data/input/} + ${index}  + '/next\')'">
+                        th:onclick="'$(\'#inputForm\').attr(\'action\', \'' + @{/data/input/} + ${index}  + '/next\')'">
                     Naprej <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
                 </button>
-            </form> 
+            </form>
         </div>
     </body>
 </html>

@@ -32,11 +32,12 @@ public class MedicalConditionFormatter implements Formatter<MedicalCondition> {
 
     @Override
     public String print(MedicalCondition condition, Locale locale) {
-        return condition.getId().toString();
+        return "medicalcondition_" + condition.getId().toString();
     }
 
     @Override
     public MedicalCondition parse(String id, Locale locale) throws ParseException {
+        id = id.replace("medicalcondition_", "");
         try {
             MedicalCondition condition = medicalConditionService.getMedicalConditionById(Long.parseLong(id));
             return condition;

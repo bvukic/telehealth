@@ -27,7 +27,7 @@ public class GenericChartController extends GenericController {
     }
     
     
-    public ChartData genChartData(List<MedicalData> dataList) {
+    protected ChartData genChartData(List<MedicalData> dataList) {
         
         if (dataList.isEmpty()) {
             return new ChartData();
