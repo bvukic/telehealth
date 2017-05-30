@@ -55,6 +55,7 @@ public class SipAddressParserTest {
         sipAddressList.add("sip:014324147208988@172.18.22.200:iser=phone");
         sipAddressList.add("sip:+38651952000@ocmpt.ims.mobitel.si;reason=unknown;privacy=off;counter=1");
         sipAddressList.add("sip:38651952000@ocmpt.ims.mobitel.si;reason=unknown;privacy=off;counter=1");
+        sipAddressList.add("sip:51952000;phone-context=+386@ocmpt.ims.mobitel.si;reason=unknown;privacy=off;counter=1");
         sipAddressList.add("sip:anonymous@ocmpt.ims.mobitel.si;reason=unknown;privacy=off;counter=1");
         sipAddressList.add("sip:Anonymous@172.18.22.200");
         sipAddressList.add("sip:UNKNOWN@172.18.22.200");
@@ -65,6 +66,7 @@ public class SipAddressParserTest {
         expResultListNational.add("0014324147208988");
         expResultListNational.add("051952000");
         expResultListNational.add("051952000");
+        expResultListNational.add("051952000");
         expResultListNational.add("anonymous");
         expResultListNational.add("anonymous");
         expResultListNational.add("anonymous");
@@ -73,6 +75,7 @@ public class SipAddressParserTest {
         expResultListInternational.add("0038614720988");
         expResultListInternational.add("0038614720988");
         expResultListInternational.add("0014324147208988");
+        expResultListInternational.add("0038651952000");
         expResultListInternational.add("0038651952000");
         expResultListInternational.add("0038651952000");
         expResultListInternational.add("anonymous");

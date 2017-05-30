@@ -21,7 +21,8 @@ import si.bvukic.telehealth.ivr.util.model.TelType;
 public class SipAddressParser {
     
     private static final Logger LOG = LoggerFactory.getLogger(SipAddressParser.class);
-    private static final String TEL_PATTERN = "^sip:\\+?([0-9A-Fa-f]+)@.*$";
+    private static final String TEL_PATTERN = "^sip:\\+?([0-9A-Fa-f]+);?.*@.*$";
+    private static final String TEL_CONTEXT = "^sip:\\+?[0-9A-Fa-f]+;phone-context=\\+?([0-9]{1,3})@.*$";
     private static final String ANONYMOUS_PATTERN = "^sip:\\+?0?(?:anonymous|unknown|unavailable|notset|unset|null)@.*$";
     
     
@@ -44,6 +45,11 @@ public class SipAddressParser {
         
         if (matcher.matches()) {
             String tel = matcher.group(1);
+            Pattern ctxPattern = Pattern.compile(TEL_CONTEXT);
+            Matcher ctxMatcher = ctxPattern.matcher(sipAddress);
+            tel = (ctxMatcher.matches() && ctxMatcher.groupCount() > 0) ? ctxMatcher.group(1) + tel : tel;
+            LOG.debug("Extracted tel: {} from: {}", tel, sipAddress);
+            
             
             switch (type) {
                 case NATIONAL:
